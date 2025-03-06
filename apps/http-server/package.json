@@ -1,0 +1,17 @@
+{
+  "name": "http-server",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/body-parser": "^1.19.5",
+    "body-parser": "^1.20.3",
+    "db": "*",
+    "express": "^4.21.2"
+  }
+}
