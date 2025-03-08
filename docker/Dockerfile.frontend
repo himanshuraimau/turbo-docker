@@ -2,7 +2,8 @@ FROM oven/bun:1
 
 WORKDIR /usr/src/app
 
-ARG DATABASE_URL
+# Set DATABASE_URL as ENV instead of ARG for better availability
+ENV DATABASE_URL=${DATABASE_URL}
 
 # Copy dependency files first for better caching
 COPY ./package.json ./turbo.json ./bun.lock ./
@@ -14,7 +15,12 @@ RUN bun install
 COPY . .
 
 RUN bun run db:migrate
-RUN DATABASE_URL=${DATABASE_URL} bun run build
+
+# Generate Prisma client first
+RUN cd packages/db && bun x prisma generate
+
+# Build the application
+RUN cd apps/web && bun run build
 
 EXPOSE 3001
 
