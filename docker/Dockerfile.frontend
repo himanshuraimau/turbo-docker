@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 # Define build argument first
 ARG DATABASE_URL
 # Set it as environment variable for runtime
-ENV DATABASE_URL=$DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL \
+    NODE_ENV=production
 
 COPY ./packages ./packages
 COPY ./bun.lock ./bun.lock
@@ -18,11 +19,20 @@ COPY ./apps/web ./apps/web
 RUN bun install
 RUN bun run db:migrate
 
-# Create env file with proper quoting
-RUN echo "DATABASE_URL='${DATABASE_URL}'" > ./apps/web/.env.production
+# Generate Prisma client first
+RUN cd packages/db && bun x prisma generate && cd ../..
 
-# Use env in build
-RUN bun run build
+# Create env file with proper quoting
+RUN echo "DATABASE_URL='${DATABASE_URL}'" > ./apps/web/.env.production && \
+    echo "NODE_ENV=production" >> ./apps/web/.env.production
+
+# Debug: List environment file contents (masked)
+RUN cat ./apps/web/.env.production | sed 's/DATABASE_URL=.*/DATABASE_URL=***/'
+
+# Build with verbose output
+RUN cd apps/web && \
+    echo "Building from $(pwd)" && \
+    bun run build || (echo "Build failed" && cat .next/error.log && exit 1)
 
 EXPOSE 3000
 
