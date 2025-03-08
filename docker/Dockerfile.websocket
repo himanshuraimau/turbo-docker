@@ -1,0 +1,18 @@
+FROM oven/bun:1
+
+WORKDIR /usr/src/app
+
+# Copy dependency files first for better caching
+COPY ./package.json ./turbo.json ./bun.lock ./
+COPY ./packages ./packages
+COPY ./apps/ws-server ./apps/ws-server
+
+RUN bun install
+
+COPY . .
+
+RUN bun run db:migrate
+
+EXPOSE 3002
+
+CMD ["bun", "run", "start:ws-server"]

@@ -1,21 +1,11 @@
 import express from "express";
-import bodyParser from "body-parser";
 import { prismaClient } from "db/client";
 
 const app = express();
 
-// Configure body parsing middleware with explicit options
-app.use(bodyParser.json({
-    limit: '10mb'
-}));
-app.use(bodyParser.urlencoded({
-    limit: '10mb',
-    extended: true
-}));
+app.use(express.json());
 
-
-
-app.get("/user", (req, res) => {
+app.get("/users", (req, res) => {
     prismaClient.user.findMany()
         .then(users => {
             res.json({ users });
@@ -47,6 +37,6 @@ app.post("/user", (req, res) => {
         });
 })
 
-app.listen(3001,
-    () => console.log("Server running on http://localhost:3001")
+app.listen(8080,
+    () => console.log("Server running on http://localhost:8080")
 );
