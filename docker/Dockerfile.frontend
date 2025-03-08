@@ -14,7 +14,7 @@ RUN bun install
 COPY . .
 
 RUN bun run db:migrate
-RUN DATABASE_URL=$DATABASE_URL bun run build
+RUN DATABASE_URL=${DATABASE_URL} bun run build
 
 EXPOSE 3001
 
