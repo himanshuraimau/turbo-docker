@@ -17,10 +17,9 @@ COPY ./turbo.json ./turbo.json
 COPY ./apps/web ./apps/web
 
 RUN bun install
-RUN bun run db:migrate
 
-# Generate Prisma client first
-RUN cd packages/db && bun x prisma generate && cd ../..
+# Generate Prisma client and run migrations
+RUN cd packages/db && bun x prisma generate && bun x prisma migrate deploy && cd ../..
 
 # Create env file with proper quoting
 RUN echo "DATABASE_URL='${DATABASE_URL}'" > ./apps/web/.env.production && \
